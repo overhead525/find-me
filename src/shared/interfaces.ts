@@ -18,15 +18,6 @@ export interface LocationState {
   location: Location;
 }
 
-export interface CurrentQueryState {
-  currentQuery: string;
-}
-
-export interface QueryResultsState {
-  status: queryResultsStatus;
-  results: Array<string>;
-}
-
 export interface QueryState {
   currentQuery: string;
   status: queryResultsStatus;

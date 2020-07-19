@@ -3,7 +3,6 @@ import {
   INIT_SEARCH,
   COMPLETE_SEARCH,
   SET_CURRENT_QUERY,
-  INIT_QUERY,
   RECEIVE_QUERY_RESULTS,
   ActionTypes,
 } from './types';
@@ -26,13 +25,6 @@ export const completeSearch = (location: Location): ActionTypes => {
 export const setCurrentQuery = (input: string): ActionTypes => {
   return {
     type: SET_CURRENT_QUERY,
-    payload: input,
-  };
-};
-
-export const initQuery = (input: string): ActionTypes => {
-  return {
-    type: INIT_QUERY,
     payload: input,
   };
 };

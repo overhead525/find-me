@@ -1,7 +1,5 @@
 import {
-  CurrentQueryState,
   LocationState,
-  QueryResultsState,
   QueryState,
   queryResultsStatus,
 } from '../shared/interfaces';
@@ -28,57 +26,7 @@ export const selectedLocationReducer = (
   }
 };
 
-export const currentQueryReducer = (
-  state: CurrentQueryState,
-  action: ActionTypes
-): CurrentQueryState => {
-  switch (action.type) {
-    case 'SET_CURRENT_QUERY':
-      return {
-        ...state,
-        currentQuery: action.payload,
-      } as CurrentQueryState;
-    default:
-      return { ...state } as CurrentQueryState;
-  }
-};
-
-export const initQueryReducer = async (
-  state: QueryResultsState,
-  action: ActionTypes
-) => {
-  switch (action.type) {
-    case 'INIT_QUERY':
-      const formattedResultsArr: Array<string> = [];
-      const retrieveSuggestions = (
-        predictions: Array<google.maps.places.QueryAutocompletePrediction>,
-        status: google.maps.places.PlacesServiceStatus
-      ) => {
-        if (status != google.maps.places.PlacesServiceStatus.OK) {
-          return;
-        }
-
-        predictions.forEach((prediction) => {
-          formattedResultsArr.push(prediction.description);
-        });
-      };
-      const service = new google.maps.places.AutocompleteService();
-      await service.getQueryPredictions(
-        {
-          input: action.payload,
-        },
-        retrieveSuggestions
-      );
-      return {
-        status: 1,
-        results: formattedResultsArr,
-      } as QueryResultsState;
-    default:
-      return { ...state } as QueryResultsState;
-  }
-};
-
-export const queryReducer = async (state: QueryState, action: ActionTypes) => {
+export const queryReducer = (state: QueryState, action: ActionTypes) => {
   switch (action.type) {
     case 'SET_CURRENT_QUERY':
       return {

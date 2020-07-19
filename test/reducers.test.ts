@@ -1,15 +1,10 @@
 import {
   locationStateStatus,
   LocationState,
-  CurrentQueryState,
-  QueryResultsState,
   queryResultsStatus,
+  QueryState,
 } from '../src/shared/interfaces';
-import {
-  selectedLocationReducer,
-  currentQueryReducer,
-  initQueryReducer,
-} from '../src/reducers';
+import { selectedLocationReducer, queryReducer } from '../src/reducers';
 import { ActionTypes } from '../src/actions/types';
 
 describe('test selectedLocationReducer', () => {
@@ -38,14 +33,14 @@ describe('test selectedLocationReducer', () => {
     payload: { lat: 40.7128, lng: 74.006 },
   };
 
-  const initQueryAction: ActionTypes = {
-    type: 'INIT_QUERY',
+  const setCurrQueryAction: ActionTypes = {
+    type: 'SET_CURRENT_QUERY',
     payload: 'whatever',
   };
 
   test('returns state unchanged if action.type not recognized in this reducer', () => {
     expect(
-      selectedLocationReducer(sampleLoadingState, initQueryAction)
+      selectedLocationReducer(sampleLoadingState, setCurrQueryAction)
     ).toStrictEqual(sampleLoadingState);
   });
 
@@ -62,65 +57,79 @@ describe('test selectedLocationReducer', () => {
   });
 });
 
-/*
-describe('test currentQueryReducer', () => {
-  const sampleCurrQueryState: CurrentQueryState = {
-    currentQuery: 'Shady S',
-  };
-
-  const sampleCurrQueryState2: CurrentQueryState = {
-    currentQuery: 'Shady Si',
-  };
-
-  const sampleCurrQueryAction: ActionTypes = {
-    type: 'SET_CURRENT_QUERY',
-    payload: 'Shady Si',
-  };
-
-  const sampleCurrQueryAction2: ActionTypes = {
-    type: 'SET_CURRENT_QUERY',
-    payload: 'Shady S',
-  };
-
-  test('returns state unchanged if action.type not recognized in this reducer', () => {
-    expect(
-      currentQueryReducer(sampleCurrQueryState, sampleCurrQueryAction)
-    ).toStrictEqual(sampleCurrQueryState2);
-  });
-
-  test('returns state with Shady Si after receiving state with Shady S and action', () => {
-    expect(
-      currentQueryReducer(sampleCurrQueryState, sampleCurrQueryAction)
-    ).toStrictEqual(sampleCurrQueryState2);
-  });
-
-  test('returns state with Shady S after receiving action with Shady S', () => {
-    expect(
-      currentQueryReducer(sampleCurrQueryState2, sampleCurrQueryAction2)
-    ).toStrictEqual(sampleCurrQueryState);
-  });
-});
-*/
-
-describe('test initQueryReducer', () => {
-  const initialQueryResultsState: QueryResultsState = {
-    status: queryResultsStatus.LOADING,
-    results: [],
-  };
-
-  const sampleQueryResultsAction: ActionTypes = {
-    type: 'INIT_QUERY',
-    payload: null,
-  };
-
-  const completedQueryResultsState: QueryResultsState = {
+describe('test queryReducer', () => {
+  const originalQueryState: QueryState = {
+    currentQuery: 'pizza near Syd',
     status: queryResultsStatus.COMPLETED,
-    results: ['Shady Side, Pennsylvania, PA'],
+    results: [
+      'pizza near Sydney NSW, Australia',
+      'pizza near Sydney, NS, Canada',
+      'pizza near Sydney Olympic Park NSW, Australia',
+      'pizza near Sydney CBD, NSW, Australia',
+      'pizza near Sydals, Denmark',
+    ],
+  };
+
+  const newQueryState: QueryState = {
+    currentQuery: 'pizza near New Yo',
+    status: queryResultsStatus.COMPLETED,
+    results: [
+      'pizza near New York, NY, USA',
+      'pizza near New York Mills, MN, USA',
+      'pizza near New York, USA',
+      'pizza near New York, IA, USA',
+      'pizza near New York, Lincoln, UK',
+    ],
+  };
+
+  const sampleNewCurrQueryState: QueryState = {
+    currentQuery: 'pizza near New Yo',
+    status: queryResultsStatus.LOADING,
+    results: [
+      'pizza near Sydney NSW, Australia',
+      'pizza near Sydney, NS, Canada',
+      'pizza near Sydney Olympic Park NSW, Australia',
+      'pizza near Sydney CBD, NSW, Australia',
+      'pizza near Sydals, Denmark',
+    ],
+  };
+
+  const randomAction: ActionTypes = {
+    type: 'COMPLETE_SEARCH',
+    payload: { lat: 34.4567, lng: 65.3424 },
+  };
+
+  const setCurrQueryAction: ActionTypes = {
+    type: 'SET_CURRENT_QUERY',
+    payload: 'pizza near New Yo',
+  };
+
+  const receiveQueryResultsAction: ActionTypes = {
+    type: 'RECEIVE_QUERY_RESULTS',
+    payload: [
+      'pizza near New York, NY, USA',
+      'pizza near New York Mills, MN, USA',
+      'pizza near New York, USA',
+      'pizza near New York, IA, USA',
+      'pizza near New York, Lincoln, UK',
+    ],
   };
 
   test('returns state unchanged if action.type not recognized in this reducer', () => {
+    expect(queryReducer(originalQueryState, randomAction)).toStrictEqual(
+      originalQueryState
+    );
+  });
+
+  test('returns state with status LOADING upon SET_CURRENT_QUERY action', () => {
+    expect(queryReducer(originalQueryState, setCurrQueryAction)).toStrictEqual(
+      sampleNewCurrQueryState
+    );
+  });
+
+  test('returns state with status COMPLETED and updated autocomplete results upon RECEIVE_QUERY_RESULTS action', () => {
     expect(
-      initQueryReducer(initialQueryResultsState, sampleQueryResultsAction)
-    ).toStrictEqual(completedQueryResultsState);
+      queryReducer(sampleNewCurrQueryState, receiveQueryResultsAction)
+    ).toStrictEqual(newQueryState);
   });
 });

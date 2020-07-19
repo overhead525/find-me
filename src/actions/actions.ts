@@ -1,3 +1,5 @@
+import { Dispatch } from 'redux';
+
 import { Location } from '../shared/interfaces';
 import {
   INIT_SEARCH,
@@ -44,7 +46,7 @@ export const receiveQueryResults = (results: Array<string>): ActionTypes => {
 // 4. component update triggers this function to update queryResults state
 // 5. Dropdown of query results is visible on screen
 export const getAutoCompleteResults = (input: string) => {
-  return async (dispatch) => {
+  return async (dispatch: Dispatch) => {
     dispatch(setCurrentQuery(input));
     const formattedResultsArr: Array<string> = [];
     const retrieveSuggestions = (

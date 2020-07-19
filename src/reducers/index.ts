@@ -1,3 +1,5 @@
+import { combineReducers } from 'redux';
+
 import {
   LocationState,
   QueryState,
@@ -46,3 +48,8 @@ export const queryReducer = (state: QueryState, action: ActionTypes) => {
       };
   }
 };
+
+export const rootReducer = combineReducers({
+  selectedLocationReducer: selectedLocationReducer,
+  queryReducer: queryReducer,
+});

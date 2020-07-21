@@ -76,3 +76,32 @@ export const getAutoCompleteResults = async (
   );
   store.dispatch(receiveQueryResults(arr));
 };
+
+export const getAutoCompleteResultsIn = async (
+  input: string,
+  service: google.maps.places.AutocompleteService,
+  arr: Array<string>
+) => {
+  return async (dispatch: Dispatch) => {
+    dispatch(setCurrentQuery(input));
+    const retrieveSuggestions = (
+      predictions: Array<relaxedPlacesPrediction>,
+      status: google.maps.places.PlacesServiceStatus
+    ) => {
+      if (status != 'OK') {
+        return;
+      }
+
+      predictions.forEach((prediction) => {
+        arr.push(prediction.description);
+      });
+    };
+    await service.getQueryPredictions(
+      {
+        input: input,
+      },
+      retrieveSuggestions
+    );
+    dispatch(receiveQueryResults(arr));
+  };
+};

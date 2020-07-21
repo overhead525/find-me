@@ -1,4 +1,4 @@
-import { Dispatch } from 'redux';
+import { Dispatch, Store } from 'redux';
 
 import { Location } from '../shared/interfaces';
 import {
@@ -45,29 +45,34 @@ export const receiveQueryResults = (results: Array<string>): ActionTypes => {
 // 3. State update reloads component
 // 4. component update triggers this function to update queryResults state
 // 5. Dropdown of query results is visible on screen
-export const getAutoCompleteResults = (input: string) => {
-  return async (dispatch: Dispatch) => {
-    dispatch(setCurrentQuery(input));
-    const formattedResultsArr: Array<string> = [];
-    const retrieveSuggestions = (
-      predictions: Array<google.maps.places.QueryAutocompletePrediction>,
-      status: google.maps.places.PlacesServiceStatus
-    ) => {
-      if (status != google.maps.places.PlacesServiceStatus.OK) {
-        return;
-      }
+export interface relaxedPlacesPrediction {
+  description: string;
+}
 
-      predictions.forEach((prediction) => {
-        formattedResultsArr.push(prediction.description);
-      });
-    };
-    const service = new google.maps.places.AutocompleteService();
-    await service.getQueryPredictions(
-      {
-        input: input,
-      },
-      retrieveSuggestions
-    );
-    dispatch(receiveQueryResults(formattedResultsArr));
+export const getAutoCompleteResults = async (
+  input: string,
+  service: google.maps.places.AutocompleteService,
+  arr: Array<string>,
+  store: Store
+) => {
+  store.dispatch(setCurrentQuery(input));
+  const retrieveSuggestions = (
+    predictions: Array<relaxedPlacesPrediction>,
+    status: google.maps.places.PlacesServiceStatus
+  ) => {
+    if (status != 'OK') {
+      return;
+    }
+
+    predictions.forEach((prediction) => {
+      arr.push(prediction.description);
+    });
   };
+  await service.getQueryPredictions(
+    {
+      input: input,
+    },
+    retrieveSuggestions
+  );
+  store.dispatch(receiveQueryResults(arr));
 };

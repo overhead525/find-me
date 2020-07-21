@@ -1,4 +1,3 @@
 # To-Do List
 
-- Initiate a git repository
-- Add redux to this project
+Write unit tests/integration tests for actual state updates in Redux
